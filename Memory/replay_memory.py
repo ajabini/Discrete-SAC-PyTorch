@@ -2,13 +2,15 @@ import random
 from collections import namedtuple
 
 Transition = namedtuple('Transition',
-                        ('state', 'reward', 'done', 'action', 'next_state'))
+                        ('state', 'z', 'done', 'action', 'next_state'))
 
 
 class Memory:
-    def __init__(self, memory_size):
+    def __init__(self, memory_size, seed):
         self.memory_size = memory_size
         self.memory = []
+        self.seed = seed
+        random.seed(self.seed)
 
     def add(self, *transition):
         self.memory.append(Transition(*transition))

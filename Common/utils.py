@@ -26,9 +26,9 @@ def stack_states(stacked_frames, state, is_new_episode):
 
 def make_atari(env_id, episodic_life=True):
     main_env = gym.make(env_id)
-    assert 'NoFrameskip' in main_env.spec.id
+    # assert 'NoFrameskip' in main_env.spec.id
     env = NoopResetEnv(main_env)
-    env = RepeatActionEnv(env)
+    # env = RepeatActionEnv(env)
     if episodic_life:
         env = EpisodicLifeEnv(env)
     if 'FIRE' in main_env.unwrapped.get_action_meanings():
