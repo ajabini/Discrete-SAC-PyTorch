@@ -188,12 +188,12 @@ class Disc_DIAYN_Agent: # Based on SAC agent in DIAYN code
         self.q_value_network2 = QNetwork_DIAYN(state_shape=self.state_shape, n_actions=self.n_actions, n_skills=self.n_skills).to(self.device)
 
 
-        self.value_network = ValueNetwork_DIAYN(state_shape = self.state_shape, n_skills=self.n_skills )
+        self.value_network = ValueNetwork_DIAYN(state_shape = self.state_shape, n_skills=self.n_skills ).to(self.device)
 
-        self.value_target_network = ValueNetwork_DIAYN(state_shape = self.state_shape, n_skills=self.n_skills)
+        self.value_target_network = ValueNetwork_DIAYN(state_shape = self.state_shape, n_skills=self.n_skills).to(self.device)
 
         self.hard_update_target_network()
-        self.discriminator = Discriminator(state_shape = self.state_shape, n_skills=self.n_skills)
+        self.discriminator = Discriminator(state_shape = self.state_shape, n_skills=self.n_skills).to(self.device)
 
         self.mse_loss = torch.nn.MSELoss()
         self.cross_ent_loss = torch.nn.CrossEntropyLoss()
