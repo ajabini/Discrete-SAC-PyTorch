@@ -13,7 +13,8 @@ class Logger:
     def __init__(self, agent, **config):
         self.config = config
         self.agent = agent
-        self.log_dir = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+        self.time_stamp = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+        self.log_dir = './outputs/Disc_DIAYN/run_'+self.time_stamp+'/'
         self.start_time = 0
         self.duration = 0
         self.running_reward = 0
@@ -32,12 +33,12 @@ class Logger:
 
     @staticmethod
     def create_wights_folder(dir):
-        if not os.path.exists("../models"):
-            os.mkdir("../models")
-        os.mkdir("models/" + dir)
+        # if not os.path.exists("../models"):
+        #     os.mkdir("../models")
+        os.makedirs(dir+"models/")
 
     def log_params(self):
-        with SummaryWriter("Logs/" + self.log_dir) as writer:
+        with SummaryWriter(self.log_dir) as writer:
             for k, v in self.config.items():
                 writer.add_text(k, str(v))
 
@@ -126,7 +127,8 @@ class Logger:
                    "models/" + self.log_dir + "/params.pth")
 
     def load_weights(self):
-        model_dir = glob.glob("models/*")
+        # In case loading the model from a specific run, the config['load_dir'] should point to that run's directory
+        model_dir = glob.glob(self.config['load_dir']+"models/*")
         model_dir.sort()
         checkpoint = torch.load(model_dir[-1] + "/params.pth")
         self.log_dir = model_dir[-1].split(os.sep)[-1]

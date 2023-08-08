@@ -17,13 +17,15 @@ def concat_state_latent(s, z_, n_skill):
 
 
 if __name__ == "__main__":
+
+
     params = get_params_DIAYN()
-    # Add
+
+
     test_env = gym.make(params["env_name"])
     test_env = gym.wrappers.ResizeObservation(test_env, (84, 84))
     test_env = gym.wrappers.GrayScaleObservation(test_env)
     test_env = gym.wrappers.FrameStack(test_env, 4)
-
 
     state_shape = test_env.observation_space.shape
     n_actions = test_env.action_space.n

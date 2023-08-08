@@ -36,6 +36,11 @@ def get_params():
     return total_params
 
 def get_params_DIAYN():
+
+
+
+
+
     parser = argparse.ArgumentParser(
         description="Variable parameters based on the configuration of the machine or user's choice")
 
@@ -57,27 +62,19 @@ def get_params_DIAYN():
     parser.add_argument("--reward_scale", default=1, type=float, help="The reward scaling factor introduced in SAC.")
     parser.add_argument("--seed", default=123, type=int,
                         help="The randomness' seed for torch, numpy, random & gym[env].")
+
     parser_params = parser.parse_args()
     #  Parameters based on the DIAYN and SAC papers. (From DIAYN code)
     default_params = {"lr": 3e-4, # same
                       "batch_size": 256,
                       "max_n_episodes": 5000,
-                      "max_episode_len": 1000,
+                      "max_episode_len": 90000,
                       "gamma": 0.99,
                       "alpha": 0.1,
                       "tau": 0.005,
                       "n_hiddens": 300
                       }
-    # From Discrete SAC agent above
-    # default_params = {"lr": 3e-4,
-    #                   "batch_size": 64,
-    #                   "state_shape": (4, 84, 84),
-    #                   "max_steps": int(1e+8),
-    #                   "gamma": 0.99,
-    #                   "initial_random_steps": 20000,
-    #                   "train_period": 4,
-    #                   "fixed_network_update_freq": 8000
-    #                   }
+
 
     # based on discrete Discrete SAC
     added_params = {
@@ -88,4 +85,5 @@ def get_params_DIAYN():
     }
 
     total_params = {**vars(parser_params), **default_params, **added_params}
+
     return total_params
