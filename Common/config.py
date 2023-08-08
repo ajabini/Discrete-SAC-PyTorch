@@ -67,7 +67,7 @@ def get_params_DIAYN():
     #  Parameters based on the DIAYN and SAC papers. (From DIAYN code)
     default_params = {"lr": 3e-4, # same
                       "batch_size": 256,
-                      "max_n_episodes": 5000,
+                      "max_n_episodes": 500000,
                       "max_episode_len": 90000,
                       "gamma": 0.99,
                       "alpha": 0.1,
