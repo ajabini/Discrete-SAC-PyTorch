@@ -49,7 +49,7 @@ if __name__ == "__main__":
     p_z = np.full(params["n_skills"], 1 / params["n_skills"]) # Starting with uniform distribution
     agent = Disc_DIAYN_Agent(p_z, **params)
 
-    logger = Logger(agent, **params)
+    logger = Logger_DIAYN(agent, **params)
 
     if params["do_train"]:
         if not params["train_from_scratch"]:
