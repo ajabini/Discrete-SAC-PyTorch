@@ -1,6 +1,6 @@
 import gym
 from Brain import Disc_DIAYN_Agent
-from Common import Play, Logger, get_params, get_params_DIAYN
+from Common import Play, Logger_DIAYN, get_params, get_params_DIAYN
 import numpy as np
 from tqdm import tqdm
 

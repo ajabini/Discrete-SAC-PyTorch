@@ -145,7 +145,7 @@ class Logger:
 
 
 class Logger_DIAYN:
-    def __init__(self):
+    def __init__(self, agent, **config):
         self.config = config
         self.agent = agent
         self.time_stamp = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
