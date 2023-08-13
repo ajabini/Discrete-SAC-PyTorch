@@ -201,7 +201,7 @@ class Logger_DIAYN:
         assert self.to_gb(ram.used) < 0.98 * self.to_gb(ram.total), "RAM usage exceeded permitted limit!"
 
         if episode % (self.config["interval"] // 3) == 0:
-            self._save_weights(episode, *rng_states)
+            self.save_weights(episode, *rng_states)
 
         if episode % self.config["interval"] == 0:
             print("E: {}| "
