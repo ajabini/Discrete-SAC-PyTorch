@@ -104,7 +104,7 @@ class PolicyNetwork(nn.Module, ABC):
         return Categorical(probs), probs + z
 
 
-############################################################### Discrete DIAYN policy ############################
+############################################################### Discrete DIAYN policy for rgb obervation (CNN based) ############################
 class Discriminator(nn.Module, ABC): # From state -> n_skills
     def __init__(self, state_shape, n_skills):
         super(Discriminator, self).__init__()
@@ -362,3 +362,123 @@ class QNetwork_DIAYN(nn.Module, ABC):  # NN: from state -> CNN_layers -> flatten
         x = F.relu(self.fc(x))
 
         return self.q(x)
+
+
+
+
+
+############################################################### Discrete DIAYN policy for vector obervation (NN based) ############################
+
+def init_weight(layer, initializer="he normal"):
+    if initializer == "xavier uniform":
+        nn.init.xavier_uniform_(layer.weight)
+    elif initializer == "he normal":
+        nn.init.kaiming_normal_(layer.weight)
+
+class Discriminator_NN(nn.Module, ABC): # Done
+    def __init__(self, n_states, n_skills, n_hidden_filters=256):
+        super(Discriminator_NN, self).__init__()
+        self.n_states = n_states
+        self.n_skills = n_skills
+        self.n_hidden_filters = n_hidden_filters
+
+        self.hidden1 = nn.Linear(in_features=self.n_states, out_features=self.n_hidden_filters)
+        init_weight(self.hidden1, initializer="xavier uniform")
+        self.hidden1.bias.data.zero_()
+        self.hidden2 = nn.Linear(in_features=self.n_hidden_filters, out_features=self.n_hidden_filters)
+        init_weight(self.hidden2, initializer="xavier uniform")
+        self.hidden2.bias.data.zero_()
+        self.q = nn.Linear(in_features=self.n_hidden_filters, out_features=self.n_skills)
+        init_weight(self.q, initializer="xavier uniform")
+        self.q.bias.data.zero_()
+
+    def forward(self, states):
+        x = F.relu(self.hidden1(states))
+        x = F.relu(self.hidden2(x))
+        logits = self.q(x)
+        return logits
+
+class ValueNetwork_NN(nn.Module, ABC): # Done
+    def __init__(self, n_states, n_skills, n_hidden_filters=256):
+        super(ValueNetwork, self).__init__()
+        self.n_states = n_states
+        self.n_hidden_filters = n_hidden_filters
+
+        self.hidden1 = nn.Linear(in_features=self.n_states, out_features=self.n_hidden_filters)
+        init_weight(self.hidden1, initializer="xavier uniform")
+        self.hidden1.bias.data.zero_()
+        self.hidden2 = nn.Linear(in_features=self.n_hidden_filters, out_features=self.n_hidden_filters)
+        init_weight(self.hidden2, initializer="xavier uniform")
+        self.hidden2.bias.data.zero_()
+        self.value = nn.Linear(in_features=self.n_hidden_filters, out_features=1)
+        init_weight(self.value, initializer="xavier uniform")
+        self.value.bias.data.zero_()
+
+    def forward(self, states):
+        x = F.relu(self.hidden1(states))
+        x = F.relu(self.hidden2(x))
+        return self.value(x)
+
+
+class QvalueNetwork_NN(nn.Module, ABC):
+    def __init__(self, n_states, n_actions, n_skills, n_hidden_filters=256):
+        super(QvalueNetwork, self).__init__()
+        self.n_states = n_states
+        self.n_hidden_filters = n_hidden_filters
+        self.n_actions = n_actions
+        self.n_skills = n_skills
+
+
+        self.hidden1 = nn.Linear(in_features=self.n_states + self.n_skills +self.n_actions, out_features=self.n_hidden_filters)
+        init_weight(self.hidden1, initializer="xavier uniform")
+        self.hidden1.bias.data.zero_()
+        self.hidden2 = nn.Linear(in_features=self.n_hidden_filters, out_features=self.n_hidden_filters)
+        init_weight(self.hidden2, initializer="xavier uniform")
+        self.hidden2.bias.data.zero_()
+        self.q_value = nn.Linear(in_features=self.n_hidden_filters, out_features=1)
+        init_weight(self.q_value, initializer="xavier uniform")
+        self.q_value.bias.data.zero_()
+
+    def forward(self, states, actions):
+        x = torch.cat([states, actions], dim=1)
+        x = F.relu(self.hidden1(x))
+        x = F.relu(self.hidden2(x))
+        return self.q_value(x)
+
+
+
+class PolicyNetwork_NN(nn.Module, ABC):
+    def __init__(self, n_states, n_actions, n_skills, n_hidden_filters=256):
+        super(PolicyNetwork, self).__init__()
+        self.n_states = n_states
+        self.n_hidden_filters = n_hidden_filters
+        self.n_actions = n_actions
+        self.n_skills = n_skills
+
+        self.hidden1 = nn.Linear(in_features=self.n_states + self.n_skills, out_features=self.n_hidden_filters)
+        init_weight(self.hidden1, initializer="xavier uniform")
+        self.hidden1.bias.data.zero_()
+        self.hidden2 = nn.Linear(in_features=self.n_hidden_filters, out_features=self.n_hidden_filters)
+        init_weight(self.hidden2, initializer="xavier uniform")
+        self.hidden2.bias.data.zero_()
+
+        self.out = nn.Linear(in_features=self.n_hidden_filters, out_features=self.n_actions)
+        init_weight(self.out, initializer="xavier uniform")
+        self.out.bias.data.zero_()
+
+    def forward(self, states):
+        x = F.relu(self.hidden1(states))
+        x = F.relu(self.hidden2(x))
+        action_probs = F.softmax(self.out(x), dim=-1)
+
+        return action_probs
+
+    def sample_or_likelihood(self,states):
+        action_probs = self(states)
+        probs = Categorical(action_probs)
+        actions = probs.sample()
+
+        return actions, probs.log_prob(actions)
+
+
+
